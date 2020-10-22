@@ -32,7 +32,9 @@ router.get('/api/login/:usu/:pass', async (req, res, next) => {
         })
         // res.json(json[0])
     }else{
-        res.status(400).send({message:'usuario incorrecto'})
+        
+    // console.log(json)
+    res.json(all.rows)
     }
 })
 
