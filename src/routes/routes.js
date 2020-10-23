@@ -38,6 +38,15 @@ router.get('/api/login/:usu/:pass', async (req, res, next) => {
     }
 })
 
+router.post('/api/insertarDatos', async (req, res, next) => {
+    let body=req.body
+    let all = await pool.query(`insert into prueba(nombre,area,docente,encuentro_1,encuentro_2,certificado)values('${body.nombre}','${body.area}','${body.docente}','${body.encuentro_1}','${body.encuentro_2}','${body.certificado}')`);
+    json = all.rows
+    nuevoNombre=body.img;
+    // console.log(json)
+    res.json(all.rows)
+})
+
 function ensureToken(req,res,next){
     const bearerHeader = req.headers['Authorization']; 
     if (typeof bearerHeader !== undefined) {
