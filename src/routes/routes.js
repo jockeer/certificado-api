@@ -17,8 +17,8 @@ let json = {}
 
 router.get('/api/login/:usu/:pass', async (req, res, next) => {
     let all = await pool.query(`select persona.id,persona.nombre || ' ' || persona.apellido as "nombre" 
-                                from persona,usuario 
-                                where persona.id = usuario.id_persona and usu = '${req.params.usu}' and pass=MD5('${req.params.pass}')`);
+                                from persona,cuenta 
+                                where persona.id = cuenta.id_persona and usu = '${req.params.usu}' and pass=MD5('${req.params.pass}')`);
     json = all.rows
     if (json.length > 0) {
         
@@ -37,14 +37,51 @@ router.get('/api/login/:usu/:pass', async (req, res, next) => {
     res.json(all.rows)
     }
 })
+router.get('/api/consultarID/:ci', async (req, res, next) => {
+    let all = await pool.query(`select id from persona where ci='${req.params.ci}'`);
+    json = all.rows
+    console.log(all.rows[0].id)
+    
+    res.json(all.rows)
+})
+router.get('/api/datosCertificado/:id/:ce', async (req, res, next) => {
+    let all = await pool.query(`select pe.id, pe.nombre || ' ' || pe.apellido as nombre, de.fecha,de.nro_certificado,ce.titulo,ce.subtitulo
+                                from detalle_certificado de join persona pe
+                                    on(de.id_persona=pe.id)
+                                    join certificado ce
+                                    on(de.id_certificado=ce.id)
+                                where pe.id=${req.params.id} and ce.id=${req.params.ce}`);
+    json = all.rows
+    // console.log(all.rows[0].id)
+    
+    res.json(json)
+})
 
 router.post('/api/insertarDatos', async (req, res, next) => {
     let body=req.body
-    let all = await pool.query(`insert into prueba(nombre,area,docente,encuentro_1,encuentro_2,certificado)values('${body.nombre}','${body.area}','${body.docente}','${body.encuentro_1}','${body.encuentro_2}','${body.certificado}')`);
-    json = all.rows
-    nuevoNombre=body.img;
-    // console.log(json)
-    res.json(all.rows)
+    try {
+        let all = await pool.query(`insert into persona(nombre,apellido,ci,area,tipo)values('${body.nombre}','${body.apellido}','${body.ci}','${body.area}','${body.tipo}')`);
+        json = all.rows
+        nuevoNombre=body.img;
+        // console.log(json)
+        res.json(all.rows)
+        
+    } catch (error) {
+        console.log(error.detail)
+    }
+})
+router.post('/api/insertarCertificado', async (req, res, next) => {
+    let body=req.body
+    try {
+        let all = await pool.query(`insert into detalle_certificado(id_persona,id_certificado,fecha,nro_certificado)values(${body.id_persona},${body.id_certificado},'${body.fecha}','${body.nro_certificado}')`);
+        json = all.rows
+        nuevoNombre=body.img;
+        // console.log(json)
+        res.json(all.rows)
+        
+    } catch (error) {
+        console.log(error.detail)
+    }
 })
 
 function ensureToken(req,res,next){
