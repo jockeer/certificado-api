@@ -56,6 +56,30 @@ router.get('/api/datosCertificado/:id/:ce', async (req, res, next) => {
     
     res.json(json)
 })
+router.get('/api/verificarPersona/:ci', async (req, res, next) => {
+    let all = await pool.query(`select * from persona where ci='${req.params.ci}'`);
+    json = all.rows
+    // console.log(all.rows[0].id)
+    res.json(json)
+})
+router.get('/api/traerCertificados/:id_persona', async (req, res, next) => {
+    let all = await pool.query(`
+    select de.id,ce.titulo,ce.subtitulo,de.gestion,de.semestre
+    from detalle_certificado de, certificado ce 
+    where id_persona=${req.params.id_persona} and de.id_certificado=ce.id`);
+    json = all.rows
+    // console.log(all.rows[0].id)
+    res.json(json)
+})
+router.get('/api/traerGestiones/:id_persona', async (req, res, next) => {
+    let all = await pool.query(`
+    select de.gestion
+        from detalle_certificado de, certificado ce 
+        where id_persona=${req.params.id_persona} and de.id_certificado=ce.id group by de.gestion`);
+    json = all.rows
+    // console.log(all.rows[0].id)
+    res.json(json)
+})
 
 router.post('/api/insertarDatos', async (req, res, next) => {
     let body=req.body
@@ -73,7 +97,7 @@ router.post('/api/insertarDatos', async (req, res, next) => {
 router.post('/api/insertarCertificado', async (req, res, next) => {
     let body=req.body
     try {
-        let all = await pool.query(`insert into detalle_certificado(id_persona,id_certificado,fecha,nro_certificado)values(${body.id_persona},${body.id_certificado},'${body.fecha}','${body.nro_certificado}')`);
+        let all = await pool.query(`insert into detalle_certificado(id_persona,id_certificado,semestre,gestion,mes,dia,nro_certificado)values(${body.id_persona},${body.id_certificado},'${body.semestre}','${body.gestion}','${body.mes}','${body.dia}','${body.nro_certificado}')`);
         json = all.rows
         nuevoNombre=body.img;
         // console.log(json)
