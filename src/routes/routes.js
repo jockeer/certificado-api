@@ -44,13 +44,13 @@ router.get('/api/consultarID/:ci', async (req, res, next) => {
     
     res.json(all.rows)
 })
-router.get('/api/datosCertificado/:id/:ce', async (req, res, next) => {
-    let all = await pool.query(`select pe.id, pe.nombre || ' ' || pe.apellido as nombre, de.fecha,de.nro_certificado,ce.titulo,ce.subtitulo
+router.get('/api/datosCertificado/:id', async (req, res, next) => {
+    let all = await pool.query(`select de.id, pe.nombre || ' ' || pe.apellido as nombre, de.semestre,de.gestion,de.mes,de.dia,de.nro_certificado,ce.titulo,ce.subtitulo
                                 from detalle_certificado de join persona pe
                                     on(de.id_persona=pe.id)
                                     join certificado ce
                                     on(de.id_certificado=ce.id)
-                                where pe.id=${req.params.id} and ce.id=${req.params.ce}`);
+                                where de.id=${req.params.id}`);
     json = all.rows
     // console.log(all.rows[0].id)
     
