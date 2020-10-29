@@ -16,10 +16,11 @@ router.get('/', function (req, res, next) {
 let json = {}
 
 router.get('/api/login/:usu/:pass', async (req, res, next) => {
-    let all = await pool.query(`select persona.id,persona.nombre || ' ' || persona.apellido as "nombre" 
+    let all = await pool.query(`select persona.id,persona.tipo,persona.nombre || ' ' || persona.apellido as "nombre" 
                                 from persona,cuenta 
                                 where persona.id = cuenta.id_persona and usu = '${req.params.usu}' and pass=MD5('${req.params.pass}')`);
     json = all.rows
+    console.log(json)
     if (json.length > 0) {
         
         JWT.sign({json},'my_secret_key',{
